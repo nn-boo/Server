@@ -1,0 +1,32 @@
+version: "3"
+services:
+  web:
+    build: ./
+    ports:
+      - "80:80"
+#    volumes:
+#      - ./src:/var/www/html
+
+  drawer:
+    container_name: drawer
+    image: php:7.2-apache
+    ports:
+      - 1001:80
+    volumes:
+      - ./drawer:/var/www/html
+
+  sorting:
+      container_name: sorting
+      image: php:7.2-apache
+      ports:
+        - 1002:80
+      volumes:
+        - ./sorting:/var/www/html
+
+  console:
+      container_name: console
+      image: php:7.2-apache
+      ports:
+        - 1003:80
+      volumes:
+        - ./console:/var/www/html
