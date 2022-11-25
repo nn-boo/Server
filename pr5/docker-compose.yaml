@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  apache:
+    build:
+     ./conf-serv
+    container_name: APACHE
+    volumes:
+      - ./src:/var/www/myserver/html
+      - ./httpd/httpd.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./httpd/php.ini:/usr/local/etc/php/php.ini
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.13
+    container_name: NGINX
+    ports:
+      - 80:80
+    volumes:
+      - ./src:/var/www/myserver/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - apache
+  
+  mysql:
+    container_name: MYSQL
+    hostname: MYSQL
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      HOSTNAME: MYSQL
+    volumes:
+       - "./sql:/docker-entrypoint-initdb.d"
+       - "dbdata:/var/lib/mysql"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 1s
+      retries: 10
+
+  redis:
+    container_name: REDIS
+    hostname: REDIS
+    build:
+      ./redis
+    volumes:
+      - "./redis:/etc/redis"
+    depends_on:
+      - apache
+
+volumes:
+  dbdata:
+
